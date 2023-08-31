@@ -1,6 +1,12 @@
+recentSearchCache = [];
+currentIndex = 1;
+
 // Get user input
 document.querySelector(".search").addEventListener("click", () => {
+  currentIndex = 1;
+  
   const search = document.querySelector("#search-query").value;
+  recentSearchCache.push(search);
 
   fetchBooks(search);
 
@@ -18,9 +24,19 @@ input.addEventListener("keypress", (event) => {
   }
 });
 
+// Navigate to next page of books
+
+const nextPage = document.querySelector(".next-page");
+
+nextPage.addEventListener('click', () => {
+  currentIndex++;
+  fetchBooks(recentSearchCache[recentSearchCache.length - 1]);
+});
+
 const fetchBooks = function (query) {
+  console.log(currentIndex)
   const search = query.toLowerCase().replaceAll(/\s+/g, "+");
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${search}`;
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${search}&${currentIndex}`;
   try {
     fetch(url, {
       method: "GET",
@@ -73,5 +89,13 @@ const renderBooks = function (books) {
     `;
 
     document.querySelector(".books").insertAdjacentHTML("beforeend", template);
+
+    addNextPageBtn();
   });
+};
+
+const addNextPageBtn = function () {
+  const template = `<button type="button" class="btn btn-secondary">Next Page</button>`;
+
+  document.querySelector(".next-page").innerHTML = template;
 };
